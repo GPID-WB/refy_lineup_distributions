@@ -1,7 +1,7 @@
-source("init.R")
-source("refy.R")
-source("refy_mult_factor.R")
-source("refy_distributions.R")
+source("R/init.R")
+source("R/refy.R")
+source("R/refy_mult_factor.R")
+source("R/refy_distributions.R")
 
 # Create rm object
 dt_ref <- refy(gls = gls,
