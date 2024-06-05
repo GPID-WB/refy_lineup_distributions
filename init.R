@@ -17,7 +17,9 @@ withr::with_dir(new = base_dir,
 
 # Load utils functions
 source("R/utils.R")
-
+library(collapse)
+library(data.table)
+library(joyn)
 # Load objects
 gls    <- qs::qread(file = fs::path("data_inputs/gls.qs"))
 dsm    <- qs::qread(file = fs::path("data_inputs/dsm.qs"))
