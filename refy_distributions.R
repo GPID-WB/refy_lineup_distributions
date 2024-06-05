@@ -38,13 +38,16 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
             # weights scaled by ratio of ref year and svy year pop
             #         to make relative to reference year
             # weights adj by rel dist to get weighted average of population at ref year
-            frq_weight = weight * (reporting_pop / svy_pop) * # "adjust to WDI population" --> Andres, your comment
-              relative_distance,
+            weight_refy = weight * (reporting_pop / svy_pop) * # "adjust to WDI population" --> Andres, your comment
+              relative_distance ,
             # ref year weights divided by number of imputations
             #      this should sum to poplution amount
-            weight_refy = frq_weight / n_imp) |>
+            weight  = frq_weight / n_imp) |>
     fungroup() |>
-    fmutate(welfare = welfare * mult_factor)
+    fmutate(welfare_refy = welfare_ppp * mult_factor)
+
+  # temp
+  setkey(ref2012_zaf, NULL)
 
   df_refy
 
