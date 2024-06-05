@@ -10,14 +10,14 @@ extract_year <- function(string) {
   as.double(year)
 }
 
-
+# Nth smallest number in a vector
 minN <- function(x, N = 2){
   len <- length(x)
   if (N > len) {
     warning('N greater than length(x).  Setting N=length(x)')
     N <- length(x)
   }
-  sort(x,partial = N)[N]
+  sort(x, partial = N)[N]
 }
 
-minN(1:10)
+minN(4:10)
