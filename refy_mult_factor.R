@@ -1,6 +1,6 @@
-refy_mult_factor <- function(rm, cntry_code, refy, gls) {
+refy_mult_factor <- function(df_refy) {
 
-  rm |>
+  df_refy |>
     fmutate(lineup_approach = fcase(estimation_type == "extrapolation" , "extrapolation",
                                     estimation_type == "interpolation" & monotonic == TRUE & same_direction == TRUE, "interpolation_same",
                                     estimation_type == "interpolation" & !(monotonic == TRUE & same_direction == TRUE), "interpolation_diverge",
