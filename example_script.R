@@ -73,6 +73,7 @@ dt_ref |>
 ref2012_nga |>
   fgroup_by(survey_year) |>
   fsummarise(sum_welfare      = fsum(welfare_ppp),
-             sum_welfare_refy = fsum(welfare_refy))
+             sum_welfare_refy = fsum(welfare_refy),
+             mean_welfare_ref = fmean(welfare_refy, w = weight_refy))
 dt_ref |>
   fsubset(reporting_year == 2012 & country_code == "NGA", predicted_mean_ppp)
