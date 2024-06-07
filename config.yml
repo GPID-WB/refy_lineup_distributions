@@ -1,0 +1,16 @@
+default:
+  s_path: "E:/Povcalnet/01.personal"
+
+wb612474:
+  my_pipe_path: "pip_technical_work/pip_ingestion_pipeline"
+  l_path: "C:/Users/wb612474/OneDrive - WBG"
+  base_dir: !expr if (Sys.info()['nodename'] == "WBGMSDDG001")
+                    fs::path(s_path, Sys.info()['user'], my_pipe_path)
+                    else fs::path(l_path,   my_pipe_path)
+
+wb384996:
+  my_pipe_path: "PIP/pip_ingestion_pipeline"
+  l_path: ""
+  base_dir: !expr if (Sys.info()['nodename'] == "WBGMSDDG001")
+                    fs::path(s_path, Sys.info()['user'], my_pipe_path)
+                    else fs::path(l_path,   my_pipe_path)

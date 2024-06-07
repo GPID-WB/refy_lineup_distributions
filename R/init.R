@@ -1,5 +1,6 @@
 # Load packages
-base_dir <- fs::path("C:/Users/wb612474/OneDrive - WBG/pip_technical_work/pip_ingestion_pipeline")
+config   <-  config::get(config = Sys.info()['user'])
+base_dir <- config$base_dir
 withr::with_dir(new = base_dir,
                 code = {
                   # source("./_packages.R")
