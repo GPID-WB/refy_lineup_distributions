@@ -57,6 +57,30 @@ save_ref_dist <- function(df_refy,
 
 
 
+#' Save and minimize all reference year distributions individually in a list
+#'
+#' A wrapper over [save_ref_dist] applied on a list of data frames
+#'
+#' @param list_refy list of data frames output from [refy_distributions]
+#' @param path path to save the output - "P:\03.pip\lineup_distributions\output-lineup-ref-years"
+#'
+#' @return invisible logical - purpose is to save files
+#' @keywords internal
+apply_save_ref_dist <- function(list_refy,
+                                path) {
+
+  lapply(list_refy,
+         FUN = function(x) {
+           save_ref_dist(df_refy = x,
+                         path    = path)
+         })
+
+  invisible(TRUE)
+}
+
+
+
+
 
 
 
