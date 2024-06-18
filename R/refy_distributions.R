@@ -8,7 +8,8 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
               reporting_year == ref_year)
 
   # reduce rm
-  rm <- rm |>
+  rm <-
+    rm |>
     vars_to_attr(vars = c("income_group_code",
                           "reporting_year",
                           "nac",
@@ -48,7 +49,8 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
                                       }))
 
   # Join welfare & weights vectors from surveys to rm
-  df_refy <- rm |>
+  df_refy <-
+    rm |>
     joyn(y          = df_svy,
          by         = c("country_code",
                         "reporting_level",
