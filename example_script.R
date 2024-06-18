@@ -20,6 +20,16 @@ ref2012_zaf <- refy_distributions(rm         = dt_ref,
                                   ref_year   = 2012,
                                   gls        = gls)
 
+ref2000_zaf <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "ZAF", # another very random country
+                                  ref_year   = 2000,
+                                  gls        = gls)
+
+ref2001_zaf <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "ZAF", # another very random country
+                                  ref_year   = 2001,
+                                  gls        = gls)
+
 ref2012_nga <- refy_distributions(rm         = dt_ref,
                                   cntry_code = "NGA", # imputation
                                   ref_year   = 2012,
@@ -76,3 +86,30 @@ ref2012_nga |>
              sum_welfare_refy = fsum(welfare_refy))
 dt_ref |>
   fsubset(reporting_year == 2012 & country_code == "NGA", predicted_mean_ppp)
+
+# save ref dist
+save_ref_dist(df_refy = ref2001_zaf,
+              path    = output_dir_refy)
+
+
+# Full refy estimate and save
+full_refy_estimate_save(df_refy = dt_ref,
+                        cntry_refy = list(list(country_code = "ZAF",
+                                               year         = 2000:2005),
+                                          list(country_code = "COL",
+                                               year         = 2000:2005)),
+                        path = output_dir_refy)
+
+
+list(list(country_code = "ZAF",
+          year         = 1980:2023),
+     list(country_code = "COL",
+          year         = 1980:2023))
+
+full_refy_estimate_save(df_refy = dt_ref,
+                        cntry_refy = list(list(country_code = "COL",
+                                               year         = 2001:2005)),
+                        path = output_dir_refy)
+
+
+
