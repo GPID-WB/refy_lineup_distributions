@@ -38,7 +38,8 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
                           "lineup_approach"))
 
   # Load surveys
-  cache_id <- rm$cache_id
+  cache_id <- rm$cache_id |>
+    funique()
   df_svy <- collapse::rowbind(lapply(as.list(cache_id),
                                       FUN = function(x){
                                         pipload::pip_load_cache(cache_id = x,
@@ -89,6 +90,8 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
                                                      "class",
                                                      ".internal.selfref",
                                                      names(attributes(df_refy))))])
+  df_refy <- vars_to_attr(df_refy, "n_imp")
+
   df_refy
 
 }
