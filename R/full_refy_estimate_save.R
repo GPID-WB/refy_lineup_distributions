@@ -21,7 +21,7 @@
 #'                                           list(country_code = "COL",
 #'                                                year         = 2000:2005)),
 #'                         path = output_dir_refy)
-full_refy_estimate_save <- function(df_refy, cntry_refy, path) {
+full_refy_estimate_save <- function(df_refy, cntry_refy, path, gls) {
 
   lapply(cntry_refy,
          FUN = \(x) {
