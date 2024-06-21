@@ -34,7 +34,39 @@ ref2012_nga <- refy_distributions(rm         = dt_ref,
                                   cntry_code = "NGA", # imputation
                                   ref_year   = 2012,
                                   gls        = gls)
+
+ref2011_nga <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "NGA", # imputation
+                                  ref_year   = 2011,
+                                  gls        = gls)
+ref2010_nga <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "NGA", # imputation
+                                  ref_year   = 2010,
+                                  gls        = gls)
+ref2016_nga <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "NGA", # imputation
+                                  ref_year   = 2016,
+                                  gls        = gls)
+ref1999_alb <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "ALB", # imputation
+                                  ref_year   = 1999,
+                                  gls        = gls)
+ref2007_syr <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "SYR", # imputation
+                                  ref_year   = 2007,
+                                  gls        = gls)
 ref2012_zaf |> head()
+
+ref1981_chn <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "CHN", # imputation
+                                  ref_year   = 1981,
+                                  gls        = gls)
+
+ref1982_chn <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "CHN", # imputation
+                                  ref_year   = 1982,
+                                  gls        = gls)
+
 
 # quick look at weights
 # col
@@ -88,6 +120,9 @@ ref2012_nga |>
 dt_ref |>
   fsubset(reporting_year == 2012 & country_code == "NGA", predicted_mean_ppp)
 
+
+
+
 # save ref dist
 save_ref_dist(df_refy = ref2001_zaf,
               path    = output_dir_refy)
@@ -111,6 +146,12 @@ full_refy_estimate_save(df_refy = dt_ref,
                         cntry_refy = list(list(country_code = "COL",
                                                year         = 2001:2005)),
                         path = output_dir_refy)
+
+full_refy_estimate_save(df_refy = dt_ref,
+                        cntry_refy = list(list(country_code = "NGA",
+                                               year         = 2010:2015)),
+                        path = output_dir_refy,
+                        gls = gls)
 
 
 
