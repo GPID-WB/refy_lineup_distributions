@@ -7,10 +7,12 @@
 library(targets)
 library(fastverse)
 library(joyn)
+library(qs)
 
 # Only uncomment when eneded:
 devtools::install_github(repo = "PIP-Technical-Team/pipdata@DEV")
 
+library(pipdata)
 # library(tarchetypes) # Load other packages as needed.
 
 # Set target options:
@@ -59,12 +61,9 @@ tar_source()
 # Define objects
 #------------------------------------------
 
-output_dir <- "P:/03.pip/lineup_distributions"
-
-
-
-
-
+output_dir <- "P:/03.pip/lineup_distributions/"
+output_dir_refy <- fs::path(output_dir,
+                            "output-lineup-ref-years")
 
 
 # Replace the target list below with your own:
@@ -105,10 +104,7 @@ list(
 
   )
 
-
-
-
-  # Estiam
+  # Estimate the lineup distributions
 
 
 )
