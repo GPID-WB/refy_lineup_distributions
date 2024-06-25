@@ -33,7 +33,8 @@ all_scripts <- list.files(fs::path("R"),
                           ignore.case=TRUE)
 
 
-sapply(all_scripts[-which(all_scripts == "R/init.R")],
+sapply(all_scripts[-which(all_scripts == "R/init.R" |
+                            all_scripts == "R/draft_full_to_delete.R")],
        source,
        .GlobalEnv)
 
@@ -47,3 +48,4 @@ gls    <- qs::qread(file = fs::path("data_inputs/gls.qs"))
 dsm    <- qs::qread(file = fs::path("data_inputs/dsm.qs"))
 pinv   <- qs::qread(file = fs::path("data_inputs/pinv.qs"))
 dl_aux <- qs::qread(file = fs::path("data_inputs/dl_aux.qs"))
+
