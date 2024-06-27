@@ -88,7 +88,8 @@ refy <- function(gls, dsm, pinv, dl_aux){
     fsubset(ny == 1) # remove alternative welfare
   gv(w2k, "ny") <- NULL
 
-  ## Load survey mean ---------
+  #_____________________________________________________________________________
+  # Load survey means-----------------------------------------------------------
   mnt <- dsm |>
     fselect(country_code,
             year = reporting_year ,
@@ -103,15 +104,19 @@ refy <- function(gls, dsm, pinv, dl_aux){
          reportvar  = FALSE) |>
     # convert to national those with only one obs per year
     # number of data level
-    _[, ndl := .N, # number of reporting levels
-      by = c("country_code", "welfare_type", "year")
+    _[,
+      ndl := .N, # number of reporting levels
+      by   = c("country_code", "welfare_type", "year")
     ][, data_level := fifelse(ndl == 1,
                               "national",
                               reporting_level)
     ][,
       ndl := NULL]
 
-  ## remove national if urb/rur data level is available for the same and remve
+  #_____________________________________________________________________________
+  # Reporting level-------------------------------------------------------------
+
+  ## remove national if urb/rur data level is available for the same and remove
   # urb/rur if national available is subsequent years
   # we need to sort to create the correct id... very inefficient
   setorder(mnt, country_code, reporting_level, year)
@@ -143,6 +148,9 @@ refy <- function(gls, dsm, pinv, dl_aux){
     fsubset(tokeep == TRUE) |>
     fselect(-c(rlid, maxrlid, nry, tokeep))
 
+  #_____________________________________________________________________________
+  # Decimal years---------------------------------------------------------------
+
   ## expand those with decimal years ----
   sy <- mn |>
     fmutate(freq = fifelse(survey_year %% 1 > 0, 2, 1),
@@ -158,22 +166,26 @@ refy <- function(gls, dsm, pinv, dl_aux){
     fmutate(yid  = seqid(survey_year),
             year = fifelse(yid == 2, year_floor + 1, year_floor)) |>
     fungroup() |>
-    # fsubset(country_code == "ALB")
     fselect(-c(year_floor))
 
   ## get growth at decimal years ----------
-  dynac <- joyn::joyn(sy, nac,
-                      by = c("country_code", "data_level", "year"),
+  dynac <- joyn::joyn(sy,
+                      nac,
+                      by         = c("country_code",
+                                     "data_level",
+                                     "year"),
                       match_type = "m:1",
-                      reportvar = FALSE,
-                      keep = "left") |>
+                      reportvar  = FALSE,
+                      keep       = "left") |>
     ftransform(nac = fifelse(welfare_type == "consumption",
-                             con_growth, inc_growth)) |>
+                             con_growth,
+                             inc_growth)) |>
     ftransform(dist_weight = fifelse(yid == 1,
                                      1 - (survey_year %% 1),
                                      survey_year %% 1)) |>
     fgroup_by(country_code, reporting_level, data_level, welfare_type, survey_year, mean) |>
-    fsummarise(nac_sy = fmean(nac,dist_weight)) |>
+    fsummarise(nac_sy = fmean(nac,
+                              dist_weight)) |>
     fungroup()
 
   #temporal solution
@@ -202,16 +214,15 @@ refy <- function(gls, dsm, pinv, dl_aux){
   setkey(rynac, NULL)
 
 
-
-  # 3. Growth in Reference year ----------
+  #_____________________________________________________________________________
+  # 3. Growth in Reference year ------------------------------------------------
 
   ## svy years per ref year --------
 
   byvars <-
     c("country_code",
       "data_level",
-      "reference_year"
-    )
+      "reference_year")
   rr <-
     rynac |>
     # Get differences between reference year and svy year
@@ -223,8 +234,10 @@ refy <- function(gls, dsm, pinv, dl_aux){
                                 all(diff_year > 0), "above",
                                 default = "mixed")) |>
     fungroup() |>
-    ftransform(lineup_case = fifelse(survey_select == TRUE & lineup_case == "mixed",
-                                     "svy_year", lineup_case)) |>
+    ftransform(lineup_case = fifelse(survey_select == TRUE &
+                                       lineup_case == "mixed",
+                                     "svy_year",
+                                     lineup_case)) |>
     ftransform(sign = fcase(
       lineup_case != "svy_year" & diff_year < 0, -1, # 37 760
       lineup_case != "svy_year" & diff_year > 0, 1,  # 14 029
@@ -297,8 +310,6 @@ refy <- function(gls, dsm, pinv, dl_aux){
                reportvar = FALSE)
   #temporal solution
   setkey(cvy, NULL)
-
-
 
   # Delte temporary vars
   vars_to_del <-
