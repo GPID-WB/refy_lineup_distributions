@@ -37,7 +37,7 @@ sapply(all_scripts[-which(all_scripts == "R/init.R" |
                             all_scripts == "R/draft_full_to_delete.R")],
        source,
        .GlobalEnv)
-
+rm(all_scripts)
 library(collapse)
 library(data.table)
 library(joyn)
