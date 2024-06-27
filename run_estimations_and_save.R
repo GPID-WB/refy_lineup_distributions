@@ -29,8 +29,8 @@ full_list <-
 
 # 3) Test with specific, small choices:
 full_refy_estimate_save(df_refy    = dt_ref,
-                        cntry_refy = list(list(country_code = "SYR",
-                                               year         = 2007)),#,
+                        cntry_refy = list(list(country_code = "CHN",
+                                               year         = 2012)),#,
                                           #list(country_code = "COL",
                                                #year         = 2000:2005)),
                         path       = output_dir_refy,
@@ -50,9 +50,9 @@ print(t2 - t1)
 
 
 # 5) list from specific country: NGA
-full_list_from_nga <-
+full_list_from_fsm <-
   lapply(as.list(funique(dt_ref$country_code)[
-    which(funique(dt_ref$country_code) == "NGA"):
+    which(funique(dt_ref$country_code) == "FSM"):
       length(funique(dt_ref$country_code))]),
     FUN = \(x) {
       l        <- c(as.list(x),
@@ -71,4 +71,13 @@ t2 <- Sys.time()
 print(t2 - t1)
 
 
+# with survey years in data frame (i.e. not attribute)
+t1 <- Sys.time()
+full_refy_estimate_save(df_refy    = dt_ref,
+                        cntry_refy = full_list,
+                        path       = fs::path(output_dir, "lineups-with-survey_year"),
+                        gls = gls,
+                        inc_svy_year = TRUE)
+t2 <- Sys.time()
+print(t2 - t1)
 
