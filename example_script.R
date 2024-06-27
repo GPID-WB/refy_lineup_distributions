@@ -66,6 +66,10 @@ ref1982_chn <- refy_distributions(rm         = dt_ref,
                                   cntry_code = "CHN", # imputation
                                   ref_year   = 1982,
                                   gls        = gls)
+ref2012_chn <- refy_distributions(rm         = dt_ref,
+                                  cntry_code = "CHN", # imputation
+                                  ref_year   = 2012,
+                                  gls        = gls)
 
 
 # quick look at weights
@@ -93,6 +97,14 @@ ref2012_nga |>
              sum__adj        = fsum(weight_refy_adj))
 dl_aux$pop |>
   fsubset(year == 2012 & country_code == "NGA")
+# chn
+ref2012_chn |>
+  fgroup_by(survey_year) |>
+  fsummarise(sum_weight      = fsum(weight),
+             sum_weight_refy = fsum(weight_refy),
+             sum__adj        = fsum(weight_refy_adj))
+dl_aux$pop |>
+  fsubset(year == 2012 & country_code == "CHN")
 
 # quick look at welfare
 # col
@@ -120,6 +132,14 @@ ref2012_nga |>
 dt_ref |>
   fsubset(reporting_year == 2012 & country_code == "NGA", predicted_mean_ppp)
 
+# CHN
+ref2012_chn |>
+  fgroup_by(survey_year, reporting_level) |>
+  fsummarise(sum_welfare      = fsum(welfare_ppp),
+             sum_welfare_refy = fsum(welfare_refy),
+             mean_welfare_ref = fmean(welfare_refy, w = weight_refy))
+dt_ref |>
+  fsubset(reporting_year == 2012 & country_code == "CHN", predicted_mean_ppp)
 
 
 
