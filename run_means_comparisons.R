@@ -19,6 +19,13 @@ dt_ref <- refy(gls = gls,
 full_means <-
   means_from_refy_dist(path         = output_dir_refy,
                        country_code = NULL) # to estimate all countries
+
+# full_means <-
+#   means_from_refy_dist(path         = output_dir_refy,
+#                        country_code = "PRY") # to estimate all countries
+
+
+
 # means from `rm` table
 means_refy <- dt_ref |>
   fgroup_by(country_code, reporting_year, reporting_level, welfare_type) |>

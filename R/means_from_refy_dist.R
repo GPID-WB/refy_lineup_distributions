@@ -8,8 +8,10 @@ means_from_refy_dist <- function(path, svy = FALSE, country_code = NULL) {
     fl <- fl[grepl(pattern = country_code, x = fl)]
   }
 
-  dl <- lapply(fl,
-               function(x, p = path) {
+  dl <- lapply(cli::cli_progress_along(fl,
+                                       format = "working on {fl[{cli::pb_current}]} | {cli::pb_bar} {cli::pb_percent}"),
+               function(i, p = path) {
+                 x <- fl[i]
                  d <- qs::qread(fs::path(p, x))
 
                  if (isFALSE(svy)) {
@@ -28,7 +30,7 @@ means_from_refy_dist <- function(path, svy = FALSE, country_code = NULL) {
                              ref_year     = attributes(d)$reporting_year)
                  }
 
-                 print(x)
+                 # print(x)
                  d
 
                }) |>
