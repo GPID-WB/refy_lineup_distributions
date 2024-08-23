@@ -1,6 +1,16 @@
 
 refy_distributions <- function(rm, cntry_code, ref_year, gls) {
 
+  # ensure no factors
+  lapply(rm,
+         FUN = function(x) {
+           if (is.factor(x)) {
+             as.character(x)
+           } else {
+             x
+           }
+         }) |>
+    qDT()
   # Filter rm
   rm <-
     rm |>
@@ -79,14 +89,38 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
     funique()
   gv(rm,
      "cache_id") <- NULL
+  survey_year_rows <- list()
   df_svy <- collapse::rowbind(lapply(as.list(cache_id),
                                       FUN = function(x){
                                         pipload::pip_load_cache(cache_id = x,
-                                                                version = gls$vintage_dir) |>
+                                                                version  = gls$vintage_dir) |>
                                           fselect(country_code, surveyid_year, survey_acronym,
                                                   survey_year, welfare_ppp, weight,
                                                   reporting_level, welfare_type, imputation_id)
+
                                       }))
+
+  # Make survey year rows an attribute
+  survey_years_rows <- df_svy |>
+    fselect(survey_year) |>
+    fmutate(rows = 1:fnrow(df_svy)) |>
+    fgroup_by(survey_year) |>
+    fsummarise(rows = fmax(rows))
+
+  survey_years_rows <-
+    list(survey_years = survey_years_rows$survey_year,
+         rows         = survey_years_rows$rows)
+
+  # Make reporting level rows an attribute
+  reporting_level_rows <- df_svy |>
+    fselect(reporting_level) |>
+    fmutate(rows = 1:fnrow(df_svy)) |>
+    fgroup_by(reporting_level) |>
+    fsummarise(rows = fmax(rows))
+
+  reporting_level_rows <-
+    list(reporting_level = as.character(reporting_level_rows$reporting_level),
+         rows            = reporting_level_rows$rows)
 
   # Join welfare & weights vectors from surveys to rm
   df_refy <-
@@ -112,7 +146,7 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
             weight_refy = weight * (reporting_pop / svy_pop) * # "adjust to WDI population" --> Andres, your comment
               relative_distance#,
             # ref year weights divided by number of imputations
-            #      this should sum to poplution amount
+            #      this should sum to population amount
             #weight_refy_adj = weight_refy / n_imp
             ) |>
     fungroup() |>
@@ -120,6 +154,11 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
 
   # temp
   setkey(df_refy, NULL)
+
+  # Make welfare type an attribute
+  df_refy <-
+    df_refy |>
+    vars_to_attr(vars = c("welfare_type"))
 
   # keep attributes of rm
   attributes(df_refy) <- c(attributes(df_refy),
@@ -131,6 +170,21 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
                                                      ".internal.selfref",
                                                      names(attributes(df_refy))))])
   df_refy <- vars_to_attr(df_refy, "n_imp")
+  attr(df_refy,
+       "survey_years_rows")    <- survey_years_rows
+
+  df_refy <- df_refy |>
+    vars_to_attr(var = c("country_code",
+                         "survey_acronym",
+                         "survey_year"))
+
+  dist_stats <- dist_stats(df = df_refy)
+  attr(df_refy,
+       "dist_stats") <- dist_stats
+
+  attr(df_refy,
+       "reporting_level_rows") <- reporting_level_rows
+
   gv(df_refy,
      c("svy_pop",
        "relative_distance",
@@ -138,7 +192,8 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
        "surveyid_year",
        "mult_factor",
        "welfare_ppp",
-       "weight")) <- NULL
+       "weight",
+       "reporting_level")) <- NULL
 
   df_refy
 
@@ -146,6 +201,71 @@ refy_distributions <- function(rm, cntry_code, ref_year, gls) {
 
 
 
+
+dist_stats <- function(df) {
+
+  # min
+  min <- fmin(df$welfare_refy,
+              g = df$reporting_level) |>
+    as.list()
+
+  # max
+  max <- fmax(df$welfare_refy,
+              g = df$reporting_level) |>
+    as.list()
+
+  # mean
+  mean <- fmean(x = df$welfare_refy,
+                w = df$weight_refy,
+                g = df$reporting_level) |>
+    as.list()
+
+  # median
+  median <- fmedian(x = df$welfare_refy,
+                    w = df$weight_refy,
+                    g = df$reporting_level) |>
+    as.list()
+
+  # gini
+  gini <- sapply(df$reporting_level |> funique(),
+                 FUN = \(x) {
+                   wbpip::md_compute_gini(welfare = df$welfare_refy[df$reporting_level == x],
+                                          weight  = df$weight_refy[df$reporting_level == x])
+                 }) |>
+    as.list()
+
+  # mld
+  mld <- sapply(df$reporting_level |> funique(),
+                FUN = \(x) {
+                  wbpip::md_compute_mld(welfare = df$welfare_refy[df$reporting_level == x],
+                                        weight  = df$weight_refy[df$reporting_level == x],
+                                        mean    = mean$x)
+                }) |>
+    as.list()
+
+  # polarization
+  pol <- sapply(df$reporting_level |> funique(),
+                FUN = \(x) {
+                  wbpip::md_compute_polarization(welfare = df$welfare_refy[df$reporting_level == x],
+                                                 weight  = df$weight_refy[df$reporting_level == x],
+                                                 gini    = gini[[x]],
+                                                 mean    = mean[[x]],
+                                                 median  = median[[x]])
+                }) |>
+    as.list()
+
+  # results
+  dist_stats <- list(min          = min,
+                     max          = max,
+                     mean         = mean,
+                     median       = median,
+                     gini         = gini,
+                     mld          = mld,
+                     polarization = pol)
+
+  dist_stats
+
+}
 
 
 
