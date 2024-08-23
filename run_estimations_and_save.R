@@ -3,8 +3,9 @@ source("R/refy.R")
 source("R/refy_mult_factor.R")
 source("R/refy_distributions.R")
 source("R/save_ref_dist.R")
-source("R/full_refy_estimate_save.R")
-
+source("R/add_aux_data_attr.R")
+#source("R/full_refy_estimate_save.R")
+#devtools::install_github(repo = "PIP-Technical-Team/wbpip@DEV")
 # 1) Create rm object
 dt_ref <- refy(gls = gls,
                dsm = dsm,
@@ -24,7 +25,7 @@ full_list <-
          })
 
 
-
+full_list[[3]]$country_code
 
 
 # 3) Test with specific, small choices:
@@ -34,6 +35,7 @@ full_refy_estimate_save(df_refy    = dt_ref,
                                           #list(country_code = "COL",
                                                #year         = 2000:2005)),
                         path       = output_dir_refy,
+                        dl_aux     = dl_aux,
                         gls = gls)
 
 # 4) Run entire saving process
@@ -41,7 +43,8 @@ t1 <- Sys.time()
 full_refy_estimate_save(df_refy    = dt_ref,
                         cntry_refy = full_list,
                         path       = output_dir_refy,
-                        gls = gls)
+                        dl_aux     = dl_aux,
+                        gls        = gls)
 t2 <- Sys.time()
 print(t2 - t1)
 
