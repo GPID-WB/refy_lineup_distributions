@@ -10,8 +10,8 @@ library(joyn)
 gdp <- dl_aux$gdp
 pce <- dl_aux$pce
 ig  <- dl_aux$income_groups
-pop <-   pop <- dl_aux$pop |>
-  # THis naming is different because it is merged way down in the process
+pop <- dl_aux$pop |>
+  # This naming is different because it is merged way down in the process
   frename(reporting_level = pop_data_level,
           reference_year  = year) |>
   fselect(-pop_domain)

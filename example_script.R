@@ -173,5 +173,23 @@ full_refy_estimate_save(df_refy = dt_ref,
                         path = output_dir_refy,
                         gls = gls)
 
+zaf2000 <- qs::qread(file = fs::path(output_dir_refy, "ZAF_2000.qs"))
+zaf2000 |> View()
+zaf2000$weight_refy |> unique()
 
+usa2000 <- qs::qread(file = fs::path(output_dir_refy, "USA_2000.qs"))
+usa2000 |> View()
+usa2000$weight_refy |> unique()
+
+NGA_2012 <- qs::qread(file = fs::path(output_dir_refy, "NGA_2012.qs"))
+NGA_2012$reporting_level |> unique()
+attributes(NGA_2012)$reporting_level
+
+IND_2000 <- qs::qread(file = fs::path(output_dir_refy, "IND_2000.qs"))
+IND_2000$reporting_level |> unique()
+attributes(IND_2000)$reporting_level
+
+CHN_2012 <- qs::qread(file = fs::path(output_dir_refy, "CHN_2012.qs"))
+CHN_2012$reporting_level |> unique()
+attributes(CHN_2012)$aux_data
 
