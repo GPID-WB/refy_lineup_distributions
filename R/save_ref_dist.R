@@ -34,19 +34,19 @@ save_ref_dist <- function(df_refy,
     #numvars <- c()
 
     # vars as attributes
-  if (isFALSE(inc_svy_year)) {
-    df_refy <- df_refy |>
-      vars_to_attr(var = c("country_code",
-                           "survey_year",
-                           "survey_acronym"
-      ))
-  } else {
-    df_refy <- df_refy |>
-      vars_to_attr(var = c("country_code",
-                           "survey_acronym"
-      ))
-  }
-#|>
+  # if (isFALSE(inc_svy_year)) {
+  #   df_refy <- df_refy |>
+  #     vars_to_attr(var = c("country_code",
+  #                          "survey_year",
+  #                          "survey_acronym"
+  #     ))
+  # } else {
+  #   df_refy <- df_refy |>
+  #     vars_to_attr(var = c("country_code",
+  #                          "survey_acronym"
+  #     ))
+  # }
+#|
       # per survey year
       # num_vars_to_attr(num_var = numvars,
       #                  name_var = rep("survey_year",
@@ -149,11 +149,34 @@ apply_save_ref_dist <- function(list_refy,
 #'                                           list(country_code = "COL",
 #'                                                year         = 2000:2005)),
 #'                         path = output_dir_refy)
-full_refy_estimate_save <- function(df_refy, cntry_refy, path, gls, inc_svy_year = FALSE) {
+full_refy_estimate_save <- function(df_refy, cntry_refy, path, gls, dl_aux, inc_svy_year = FALSE) {
 
-  lapply(cntry_refy,
-         FUN = \(x) {
+  # Select surveys for CPIs
+  dl_aux$cpi <-
+    dl_aux$cpi |>
+    fselect(cpi, cpi2017, cpi2011, country_code, cpi_year, cpi_data_level, survey_acronym, survey_year) |>
+    funique() |>
+    joyn::joyn(y              = dt_ref |>
+                 fselect(survey_acronym,
+                         survey_year,
+                         country_code,
+                         cpi_data_level) |>
+                 funique(),
+               by             = c("survey_acronym",
+                                  "survey_year",
+                                  "country_code",
+                                  "cpi_data_level"),
+               match_type     = "1:1",
+               keep           = "inner",
+               y_vars_to_keep = FALSE,
+               reportvar      = FALSE,
+               verbose        = FALSE)
 
+  lapply(cli::cli_progress_along(cntry_refy,
+                                 total = length(cntry_refy)),
+                                 #format = "working on {cntry_refy[[{cli::pb_current}]]$country_code} | {cli::pb_bar} {cli::pb_percent}"),
+         FUN = \(i) {
+           x <- cntry_refy[[i]]
            lapply(x$year,
                   FUN = \(year = x$year,
                           country_code = x$country_code){
@@ -162,10 +185,11 @@ full_refy_estimate_save <- function(df_refy, cntry_refy, path, gls, inc_svy_year
                                                         cntry_code = country_code,
                                                         ref_year   = year,
                                                         gls        = gls) |>
+                                       add_aux_data_attr(dl_aux          = dl_aux,
+                                                         df_refy         = df_refy,
+                                                         filter_aux_data = TRUE) |>
                                        save_ref_dist(path = path,
                                                      inc_svy_year = inc_svy_year))
-
-                    print(paste0(country_code, "_", year))
                   }
            )
          })
