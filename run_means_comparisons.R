@@ -19,13 +19,16 @@ dt_ref <- refy(gls = gls,
 full_means <-
   means_from_refy_dist(path         = output_dir_refy,
                        country_code = NULL) # to estimate all countries
+
 # means from `rm` table
 means_refy <- dt_ref |>
   fgroup_by(country_code, reporting_year, reporting_level, welfare_type) |>
-  fmutate(w = reporting_pop/sum(reporting_pop),
-          w = w*relative_distance) |>
-  fsummarise(mean_dt_ref = fmean(x = predicted_mean_ppp,
-                                 w = w))
+  #fmutate(w = reporting_pop/sum(reporting_pop), # population proportion of each svy year
+  #        w = w*relative_distance) |>           # distance from svy year to ref year
+  fsummarise(mean_dt_ref = fmean(x = predicted_mean_ppp, # already used hh svy weights
+                                 w = relative_distance))
+
+
 # Compare refy distribution means to `rm` means
 dt_mean_compare <-
   full_means |>
@@ -35,12 +38,24 @@ dt_mean_compare <-
                     "reporting_level",
                     "welfare_type"),
              keep = "left",
-             match_type = "1:1")|>
+             match_type = "1:1") |>
   fmutate(diff = 100*(mean_refy - mean_dt_ref)/mean_dt_ref)
 # These means could be slightly different
 #   because in `rm`/dt_ref it comes from the
 #   survey mean in `dsm`
 dt_mean_compare$diff |> summary()
+fsum(!dt_mean_compare$diff == 0)
+fsum(abs(dt_mean_compare$diff) < 1e-8)
+fsum(abs(dt_mean_compare$diff) > 1e-8)
+dt_mean_compare[which(abs(dt_mean_compare$diff) > 1e-8), ]
+dt_mean_compare[which(is.na(dt_mean_compare$diff)), ] |>
+  View()
+dt_ref[is.na(dt_ref$predicted_mean_ppp), ]
+dt_mean_compare[, .N, by = c("country_code", "ref_year", "reporting_level")][N > 1, ]
+
+
+
+
 
 # 3) COMPARE NAC ADJUSTED MEANS AT SVY YEARS
 #-----------------------------------------
@@ -69,3 +84,5 @@ dt_mean_compare_svy <-
 
 dt_mean_compare_svy$diff |>
   summary()
+
+
