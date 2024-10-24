@@ -1,34 +1,8 @@
 # This script is tocompare all the means and ginis for lineups to those in the
 
-
+ref1981_chn |> get_refy_stats()
 
 get_refy_stats <- function(df) {
-
-  # headcounts
-  hc215 <-
-    wbpip::md_compute_headcount(welfare = df$welfare_refy,
-                                weight  = df$weight_refy,
-                                povline = 2.15)
-  hc365 <-
-    wbpip::md_compute_headcount(welfare = df$welfare_refy,
-                                weight  = df$weight_refy,
-                                povline = 3.65)
-  hc685 <-
-    wbpip::md_compute_headcount(welfare = df$welfare_refy,
-                                weight  = df$weight_refy,
-                                povline = 6.85)
-  hc10 <-
-    wbpip::md_compute_headcount(welfare = df$welfare_refy,
-                                weight  = df$weight_refy,
-                                povline = 10)
-  hc50 <-
-    wbpip::md_compute_headcount(welfare = df$welfare_refy,
-                                weight  = df$weight_refy,
-                                povline = 50)
-
-  # gini
-  g <- wbpip::md_compute_gini(welfare = df$welfare_refy,
-                              weight  = df$weight_refy)
 
   # mean
   m <- pipload:::extract_attr(df         = df,
@@ -39,20 +13,79 @@ get_refy_stats <- function(df) {
   m <- unlist(m) |>
     unname()
 
+  df <- pipload:::attr_to_column(df,
+                                 attr_to_column = "reporting_level_rows")
+  # headcounts
+  hc215 <-
+    sapply(rl,
+           FUN = \(x) {
+             wbpip::md_compute_headcount(welfare = df[reporting_level == x,]$welfare_refy,
+                                         weight  = df[reporting_level == x,]$weight_refy,
+                                         povline = 2.15)
+           })
+
+  hc365 <-
+    sapply(rl,
+           FUN = \(x) {
+             wbpip::md_compute_headcount(welfare = df[reporting_level == x,]$welfare_refy,
+                                         weight  = df[reporting_level == x,]$weight_refy,
+                                         povline = 3.65)
+           })
+
+  hc685 <-
+    sapply(rl,
+           FUN = \(x) {
+             wbpip::md_compute_headcount(welfare = df[reporting_level == x,]$welfare_refy,
+                                         weight  = df[reporting_level == x,]$weight_refy,
+                                         povline = 6.85)
+           })
+  hc10 <-
+    sapply(rl,
+           FUN = \(x) {
+             wbpip::md_compute_headcount(welfare = df[reporting_level == x,]$welfare_refy,
+                                         weight  = df[reporting_level == x,]$weight_refy,
+                                         povline = 10)
+           })
+
+  hc50 <-
+    sapply(rl,
+           FUN = \(x) {
+             wbpip::md_compute_headcount(welfare = df[reporting_level == x,]$welfare_refy,
+                                         weight  = df[reporting_level == x,]$weight_refy,
+                                         povline = 50)
+           })
+
+  # gini
+  g <-
+    sapply(rl,
+           FUN = \(x) {
+             wbpip::md_compute_gini(welfare = df[reporting_level == x,]$welfare_refy,
+                                    weight  = df[reporting_level == x,]$weight_refy)
+           })
+
   # percentiles
-  p1 <- wbpip::md_compute_lorenz(welfare = df$welfare_refy,
-                                  weight = df$weight_refy,
-                                  nbins = 100) |>
-    fsubset(round(lorenz_weight, 2) == 0.01,
-            welfare) |>
-    as.numeric()
+  p1 <-
+    sapply(rl,
+           FUN = \(x) {
+             wbpip::md_compute_lorenz(welfare = df[reporting_level == x,]$welfare_refy,
+                                      weight  = df[reporting_level == x,]$weight_refy,
+                                      nbins   = 100) |>
+               fsubset(round(lorenz_weight, 2) == 0.01,
+                       welfare) |>
+               as.numeric()
+           })
+
   p99 <-
-    wbpip::md_compute_lorenz(welfare = df$welfare_refy,
-                              weight = df$weight_refy,
-                              nbins = 100) |>
-    fsubset(round(lorenz_weight, 2) == 0.99,
-            welfare) |>
-    as.numeric()
+    sapply(rl,
+           FUN = \(x) {
+             wbpip::md_compute_lorenz(welfare = df$welfare_refy,
+                                      weight = df$weight_refy,
+                                      nbins = 100) |>
+               fsubset(round(lorenz_weight, 2) == 0.99,
+                       welfare) |>
+               as.numeric()
+           })
+
 
   # results as list
   rl <-
