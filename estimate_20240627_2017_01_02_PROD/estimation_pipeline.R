@@ -356,6 +356,25 @@ if(!exists("full_pipr_df")) {
               fmutate(pipr_type = "popshare_99")) |>
     qDT()
 
+  full_pipr_df <-
+    full_pipr_df |>
+    joyn::joyn(y    = pipr::get_stats() |>
+                 fselect(country_code,
+                         welfare_time,
+                         gini,
+                         reporting_level,
+                         welfare_type) |>
+                 funique() |>
+                 qDT(),
+               keep = "left",
+               by   = c("country_code",
+                        "year = welfare_time",
+                        "reporting_level",
+                        "welfare_type"),
+               match_type = "1:1",
+               update_NAs = TRUE)
+
+
 }
 
 ## 4.2 get full comparison df----
