@@ -78,9 +78,9 @@ get_refy_stats <- function(df) {
   p99 <-
     sapply(rl,
            FUN = \(x) {
-             wbpip::md_compute_lorenz(welfare = df$welfare_refy,
-                                      weight = df$weight_refy,
-                                      nbins = 100) |>
+             wbpip::md_compute_lorenz(welfare = df[reporting_level == x,]$welfare_refy,
+                                      weight  = df[reporting_level == x,]$weight_refy,
+                                      nbins   = 100) |>
                fsubset(round(lorenz_weight, 2) == 0.99,
                        welfare) |>
                as.numeric()
